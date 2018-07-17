@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import org.apache.http.cookie.ClientCookie;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
@@ -56,8 +57,11 @@ public class SuningServiceImpl implements SuningService {
 				BasicClientCookie cookie = new BasicClientCookie(kv[0], kv[1]);
 				cookie.setDomain(kv[2]);
 				cookie.setPath(kv[3]);
+				cookie.setAttribute(ClientCookie.DOMAIN_ATTR, kv[2]);
+				cookie.setAttribute(ClientCookie.PATH_ATTR, kv[3]);
 				cookies.add(cookie);
 			}
+			is.close();
 			returnBean.setReturnObj(cookies);
 		} catch (Exception e) {
 			e.printStackTrace();
