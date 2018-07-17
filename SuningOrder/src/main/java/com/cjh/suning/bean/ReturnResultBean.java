@@ -12,6 +12,8 @@ public class ReturnResultBean implements Serializable{
 	private int resultCode;
 	
 	private String returnMsg;
+	
+	private Object returnObj;
 
 	public int getResultCode() {
 		return resultCode;
@@ -27,6 +29,14 @@ public class ReturnResultBean implements Serializable{
 
 	public void setReturnMsg(String returnMsg) {
 		this.returnMsg = returnMsg;
+	}
+
+	public Object getReturnObj() {
+		return returnObj;
+	}
+
+	public void setReturnObj(Object returnObj) {
+		this.returnObj = returnObj;
 	}
 
 }

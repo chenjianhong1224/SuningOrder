@@ -1,7 +1,7 @@
 var page = require('webpage').create(), stepIndex = 0, loadInProgress = false;
 var system = require('system');
 var userName = system.args[1];
-var password =  system.args[2];
+var password = system.args[2];
 var clicked = false;
 
 page.onConsoleMessage = function(msg) {
@@ -14,7 +14,8 @@ page.onLoadFinished = function(status) {
 			console.log("success");
 			var cookies = page.cookies;
 			for ( var i in cookies) {
-				console.log(cookies[i].name + "=" + cookies[i].value);
+				console.log(cookies[i].name + "=" + cookies[i].value + "="
+						+ cookies[i].domain + "=" + cookies[i].path);
 			}
 		} else {
 			console.log("failed: clicked finished, but url = " + page.url);
