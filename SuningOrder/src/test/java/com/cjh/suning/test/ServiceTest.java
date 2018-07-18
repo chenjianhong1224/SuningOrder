@@ -81,7 +81,6 @@ public class ServiceTest {
 					"{\"provinceCode\":\"210\",\"cityCode\":\"771\",\"districtCode\":\"77102\",\"cmmdtyVOList\":[{\"cmmdtyCode\":\"000000010525048635\",\"shopCode\":\"0070063411\",\"activityType\":\"01\",\"cmmdtyQty\":\"1\",\"activityId\":\"\"}],\"verifyCode\":\"\",\"uuid\":\"\",\"sceneId\":\"\"}"));
 			uri = new URIBuilder(url).addParameters(addToCar).build();
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
