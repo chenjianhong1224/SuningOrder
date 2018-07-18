@@ -16,6 +16,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -51,7 +53,7 @@ public class ServiceTest {
 		} catch (ClassNotFoundException e1) {
 
 		} catch (IOException e1) {
-
+			System.out.println("没找到本地cookie");
 		}
 		if (cookieStore == null) {
 			cookieStore = new BasicCookieStore();
@@ -98,7 +100,9 @@ public class ServiceTest {
 		headerList.add(new BasicHeader(HttpHeaders.USER_AGENT,
 				"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36"));
 		// 构造自定义的HttpClient对象
-		HttpClient httpClient = HttpClients.custom().setDefaultHeaders(headerList).build();
+		RequestConfig requestConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD_STRICT).build();
+		HttpClient httpClient = HttpClients.custom().setDefaultHeaders(headerList)
+				.setDefaultRequestConfig(requestConfig).build();
 
 		// 构造请求对象
 		HttpUriRequest httpUriRequest = RequestBuilder.get().setUri(uri).build();
@@ -107,6 +111,7 @@ public class ServiceTest {
 			HttpResponse response = httpClient.execute(httpUriRequest, httpClientContext);
 			System.out.println(response.getStatusLine().getStatusCode());
 			System.out.println(JSON.toJSONString(httpClientContext.getCookieStore().getCookies()));
+			saveCookieStore(httpClientContext.getCookieStore(), "cookie");
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
