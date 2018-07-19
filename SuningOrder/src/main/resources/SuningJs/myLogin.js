@@ -5,6 +5,8 @@ var password = system.args[2];
 var clicked = false;
 page.settings.userAgent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36';
 
+page.settings.loadImages = false; //不加载图片
+
 page.onConsoleMessage = function(msg) {
 	console.log(msg);
 }
