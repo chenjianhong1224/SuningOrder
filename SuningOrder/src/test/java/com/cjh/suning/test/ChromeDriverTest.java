@@ -46,8 +46,8 @@ public class ChromeDriverTest {
 		wait.until(isPageLoaded());
 		JavascriptExecutor j = (JavascriptExecutor) driver;
 		j.executeScript("document.getElementsByClassName('pc-login')[0].style.display='block';");
-		driver.findElement(By.id("userName")).sendKeys(new String[] { "18577787720" });
-		driver.findElement(By.id("password")).sendKeys(new String[] { "hb710chw" });
+		driver.findElement(By.id("userName")).sendKeys(new String[] { "185777077201" });
+		driver.findElement(By.id("password")).sendKeys(new String[] { "2hb7110chw3" });
 		driver.findElement(By.id("submit")).click();
 		wait.until(isPageLoaded());
 		System.out.println(driver.getCurrentUrl());
