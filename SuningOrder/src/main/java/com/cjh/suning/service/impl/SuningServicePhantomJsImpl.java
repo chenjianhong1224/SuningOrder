@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.apache.http.cookie.ClientCookie;
 import org.apache.http.impl.cookie.BasicClientCookie;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
@@ -15,8 +16,9 @@ import com.cjh.suning.bean.ReturnResultBean;
 import com.cjh.suning.service.SuningService;
 import com.google.common.collect.Lists;
 
+@Scope("prototype")
 @Service
-public class SuningServiceImpl implements SuningService {
+public class SuningServicePhantomJsImpl implements SuningService {
 
 	@Override
 	public ReturnResultBean login(String userName, String password) {
@@ -70,6 +72,31 @@ public class SuningServiceImpl implements SuningService {
 			return returnBean;
 		}
 		return returnBean;
+	}
+
+	@Override
+	public void destroy() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ReturnResultBean order(String skuUrl, String skuColor, String skuVersion, String skuPhonel, String skuBuyNum,
+			String checkPayAmount) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void refresh(String url) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ReturnResultBean testOrder(String skuUrl, String skuColor, String skuVersion, String skuPhonel) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
