@@ -77,12 +77,12 @@ public class SuningServicePhantomJsImpl implements SuningService {
 	@Override
 	public void destroy() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public ReturnResultBean order(String skuUrl, String skuColor, String skuVersion, String skuPhonel, String skuBuyNum,
-			String checkPayAmount) {
+	public ReturnResultBean orderPhone(String skuUrl, String skuColor, String skuVersion, String skuPhonel,
+			String skuBuyNum, String checkPayAmount) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -90,13 +90,20 @@ public class SuningServicePhantomJsImpl implements SuningService {
 	@Override
 	public void refresh(String url) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public ReturnResultBean testOrder(String skuUrl, String skuColor, String skuVersion, String skuPhonel) {
+	public ReturnResultBean orderMaotai(String skuUrl, String skuSerial, String skuSpec, String skuBuyNum,
+			String checkPayAmount) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void setWaitTime(String time) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

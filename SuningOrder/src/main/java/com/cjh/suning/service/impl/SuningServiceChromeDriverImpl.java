@@ -38,6 +38,8 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 
 	private boolean isInit = false;
 
+	private String waitTime = "5";
+
 	@Autowired
 	private ApplicationConfig applicationConfig;
 
@@ -93,7 +95,7 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 			WebElement webElement = null;
 			try {
 				driver.get("https://passport.suning.com/ids/login");
-				wait = new WebDriverWait(driver, 3);
+				wait = new WebDriverWait(driver, Long.parseLong(waitTime));
 				JavascriptExecutor j = (JavascriptExecutor) driver;
 				j.executeScript("document.getElementsByClassName('pc-login')[0].style.display='block';");
 				driver.findElement(By.id("userName")).sendKeys(new String[] { applicationConfig.getUserName() });
@@ -121,8 +123,8 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 	}
 
 	@Override
-	public ReturnResultBean order(String skuUrl, String skuColor, String skuVersion, String skuPhonel, String skuBuyNum,
-			String checkPayAmount) {
+	public ReturnResultBean orderPhone(String skuUrl, String skuColor, String skuVersion, String skuPhonel,
+			String skuBuyNum, String checkPayAmount) {
 		long startTime = System.currentTimeMillis();
 		long endTime = startTime;
 		ReturnResultBean returnResult = new ReturnResultBean();
@@ -131,7 +133,7 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 		WebDriverWait wait = null;
 		WebElement webElement = null;
 		if (isInit && driver != null) {
-			wait = new WebDriverWait(driver, 6);
+			wait = new WebDriverWait(driver, Long.parseLong(waitTime));
 			driver.get(skuUrl);
 			wait.until(isPageLoaded());
 			try {
@@ -206,128 +208,7 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 				returnResult.setReturnMsg("加载出现问题, 将重试");
 				return returnResult;
 			}
-			try {
-				webElement = driver.findElement(By.cssSelector("#buyNum"));
-				if (webElement == null) {
-					returnResult.setReturnMsg("没发现\"数量\"选项, 现在还不能购买");
-					return returnResult;
-				} else {
-					String max = webElement.getAttribute("max");
-					skuBuyNum = (Integer.valueOf(max) > Integer.valueOf(skuBuyNum)) ? skuBuyNum : max;
-					webElement.sendKeys(Keys.CONTROL + "a"); // 清空
-					webElement.sendKeys(new String[] { skuBuyNum });
-				}
-			} catch (org.openqa.selenium.NoSuchElementException e) {
-				returnResult.setReturnMsg("没发现\"数量\"选项, 现在还不能购买");
-				return returnResult;
-			} catch (org.openqa.selenium.WebDriverException e) {
-				returnResult.setReturnMsg("加载出现问题, 将重试");
-				return returnResult;
-			}
-			wait.until(isPageLoaded());
-			try {
-				webElement = driver.findElement(By.cssSelector("#buyNowAddCart"));
-				if (webElement == null) {
-					returnResult.setReturnMsg("没发现\"立即购买\"按钮, 现在还买不不能购买");
-					return returnResult;
-				} else {
-					if (webElement.getCssValue("display").equals("none")) {
-						returnResult.setReturnMsg("没发现\"立即购买\"按钮, 现在还买不不能购买");
-						return returnResult;
-					}
-					wait.until(ExpectedConditions.visibilityOf(webElement));
-					webElement.click();
-				}
-			} catch (org.openqa.selenium.NoSuchElementException e) {
-				returnResult.setReturnMsg("没发现\"立即购买\"按钮, 现在还买不不能购买");
-				return returnResult;
-			} catch (org.openqa.selenium.WebDriverException e) {
-				returnResult.setReturnMsg("加载出现问题, 将重试");
-				return returnResult;
-			}
-			try {
-				wait.until(ExpectedConditions
-						.visibilityOfElementLocated(By.cssSelector("#submit-btn[name='new_icart2_account_submit']")));
-			} catch (org.openqa.selenium.TimeoutException e) {
-				if (driver.getCurrentUrl().startsWith("https://shopping.suning.com/trafficLimitError.do")) {
-					returnResult.setResultCode(-2);
-					returnResult.setReturnMsg("凉凉，被苏宁盯上了, 说操作太过频繁， 预计300秒后可以正常结算");
-					return returnResult;
-				}
-				returnResult.setReturnMsg("没加载\"提交订单\"按钮, 无法购买");
-				return returnResult;
-			} catch (org.openqa.selenium.WebDriverException e) {
-				returnResult.setReturnMsg("加载出现问题, 将重试");
-				return returnResult;
-			}
-			WebElement submitWebElement = driver
-					.findElement(By.cssSelector("#submit-btn[name='new_icart2_account_submit']"));
-			try {
-				wait.until(ExpectedConditions.visibilityOf(submitWebElement));
-			} catch (org.openqa.selenium.TimeoutException e) {
-				returnResult.setReturnMsg("\"提交订单\"按钮不可见, 无法购买");
-				return returnResult;
-			} catch (org.openqa.selenium.WebDriverException e) {
-				returnResult.setReturnMsg("加载出现问题, 将重试");
-				return returnResult;
-			}
-			if (!checkPayAmount.equals("-1")) {
-				try {
-					webElement = driver.findElement(By.cssSelector("#payAmountID"));
-					if (webElement == null) {
-						returnResult.setReturnMsg("没发现\"应付金额\", 无法校验");
-						return returnResult;
-					} else {
-						String amount = webElement.getText().trim();
-						if (Double.valueOf(amount) > Double.valueOf(checkPayAmount)) {
-							returnResult.setReturnMsg("应付金额 = " + amount + "大于设定金额" + checkPayAmount + ", 暂不购买");
-							return returnResult;
-						}
-					}
-				} catch (org.openqa.selenium.NoSuchElementException e) {
-					returnResult.setReturnMsg("没发现\"应付金额\", 无法校验");
-					return returnResult;
-				} catch (org.openqa.selenium.WebDriverException e) {
-					returnResult.setReturnMsg("加载出现问题, 将重试");
-					return returnResult;
-				}
-			}
-			submitWebElement.click();
-			endTime = System.currentTimeMillis();
-			float excTime = (float) (endTime - startTime) / 1000;
-			log.info("提交订单花费时间：" + excTime + "s");
-			int retryCount = 0;
-			do {
-				try {
-					wait.until(ExpectedConditions.titleContains("支付收银台"));
-					wait.until(isPageLoaded());
-				} catch (org.openqa.selenium.TimeoutException e) {
-					if (driver.getCurrentUrl().startsWith("https://shopping.suning.com/order.do") && retryCount == 0) {
-						submitWebElement.click();
-						retryCount = 1;
-						continue;
-					}
-					if (!driver.getCurrentUrl().startsWith("https://payment.suning.com")) {
-						try {
-							webElement = driver.findElement(By.cssSelector(".container"));
-							if (webElement != null && webElement.getCssValue("display").equals("block")) {
-								webElement = webElement.findElement(By.cssSelector(".content>div>p"));
-								if (webElement != null) {
-									returnResult.setReturnMsg("凉凉: " + webElement.getText());
-									return returnResult;
-								}
-							}
-						} catch (org.openqa.selenium.NoSuchElementException e1) {
-							returnResult.setReturnMsg("好像没下单成功");
-							return returnResult;
-						}
-						returnResult.setReturnMsg("好像没下单成功");
-						return returnResult;
-					}
-				}
-			} while (retryCount == 1);
-			returnResult.setResultCode(0);
-			returnResult.setReturnMsg("好像下单成功了");
+			returnResult = orderOperation(startTime, wait, skuBuyNum, checkPayAmount, returnResult);
 		}
 		return returnResult;
 	}
@@ -338,118 +219,199 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 	}
 
 	@Override
-	public ReturnResultBean testOrder(String skuUrl, String skuColor, String skuVersion, String skuPhonel) {
+	public ReturnResultBean orderMaotai(String skuUrl, String skuSerial, String skuSpec, String skuBuyNum,
+			String checkPayAmount) {
+		long startTime = System.currentTimeMillis();
+		long endTime = startTime;
 		ReturnResultBean returnResult = new ReturnResultBean();
 		returnResult.setResultCode(-1);
-		returnResult.setReturnMsg("测试下单失败");
+		returnResult.setReturnMsg("下单失败");
 		WebDriverWait wait = null;
 		WebElement webElement = null;
 		if (isInit && driver != null) {
-			wait = new WebDriverWait(driver, 5);
+			wait = new WebDriverWait(driver, Long.parseLong(waitTime));
 			driver.get(skuUrl);
 			wait.until(isPageLoaded());
 			try {
-				webElement = driver.findElement(By.cssSelector(".clr-item[title='" + skuColor + "']"));
+				webElement = driver.findElement(By.cssSelector(".clr-item[title='" + skuSerial + "']"));
 				if (webElement != null) {
 					if (webElement.getAttribute("class").contains("disabled")) {
-						returnResult.setReturnMsg("\"" + skuColor + "\", 现在还不能购买");
+						returnResult.setReturnMsg("\"" + skuSerial + "\", 现在还不能购买");
 						return returnResult;
 					}
 					if (!webElement.getAttribute("class").contains("selected")) {
 						webElement.findElement(By.cssSelector("a")).click();
 					}
 				} else {
-					returnResult.setReturnMsg("没发现\"" + skuColor + "\", 现在还不能购买");
+					returnResult.setReturnMsg("没发现\"" + skuSerial + "\", 现在还不能购买");
 					return returnResult;
 				}
 			} catch (org.openqa.selenium.NoSuchElementException e) {
-				returnResult.setReturnMsg("没发现\"" + skuColor + "\", 现在还不能购买");
+				returnResult.setReturnMsg("没发现\"" + skuSerial + "\", 现在还不能购买");
+				return returnResult;
+			} catch (org.openqa.selenium.WebDriverException e) {
+				returnResult.setReturnMsg("加载出现问题, 将重试");
 				return returnResult;
 			}
 			wait.until(isPageLoaded());
 			try {
-				webElement = driver
-						.findElement(By.cssSelector("#versionItemList>dd>ul>li[title='" + skuVersion + "']"));
+				webElement = driver.findElement(By.cssSelector("#versionItemList>dd>ul>li[title='" + skuSpec + "']"));
 				if (webElement != null) {
 					if (webElement.getAttribute("class").contains("disabled")) {
-						returnResult.setReturnMsg("没发现\"" + skuVersion + "\", 现在还不能购买");
+						returnResult.setReturnMsg("没发现\"" + skuSpec + "\", 现在还不能购买");
 						return returnResult;
 					}
 					if (!webElement.getAttribute("class").contains("selected")) {
 						webElement.findElement(By.cssSelector("a")).click();
 					}
 				} else {
-					returnResult.setReturnMsg("没发现\"" + skuVersion + "\", 现在还不能购买");
+					returnResult.setReturnMsg("没发现\"" + skuSpec + "\", 现在还不能购买");
 					return returnResult;
 				}
 			} catch (org.openqa.selenium.NoSuchElementException e) {
-				returnResult.setReturnMsg("没发现\"" + skuVersion + "\", 现在还不能购买");
+				returnResult.setReturnMsg("没发现\"" + skuSpec + "\", 现在还不能购买");
+				return returnResult;
+			} catch (org.openqa.selenium.WebDriverException e) {
+				returnResult.setReturnMsg("加载出现问题, 将重试");
 				return returnResult;
 			}
 			wait.until(isPageLoaded());
-			try {
-				webElement = driver.findElement(By.cssSelector("#phonedl"));
-				if (webElement == null) {
-					returnResult.setReturnMsg("没发现\"" + skuPhonel + "\", 现在还不能购买");
-					return returnResult;
-				} else {
-					if (webElement.getCssValue("display").equals("none")) {
-						returnResult.setReturnMsg("没发现\"" + skuPhonel + "\", 现在还不能购买");
-						return returnResult;
-					}
-				}
-				webElement = webElement.findElement(By.cssSelector("dd>ul>li[title='" + skuPhonel + "']"));
-				if (webElement == null) {
-					returnResult.setReturnMsg("没发现\"" + skuPhonel + "\", 现在还不能购买");
-					return returnResult;
-				} else {
-					if (!webElement.getAttribute("class").contains("selected")) {
-						webElement.findElement(By.cssSelector("a")).click();
-					}
-				}
-			} catch (org.openqa.selenium.NoSuchElementException e) {
-				returnResult.setReturnMsg("没发现\"" + skuPhonel + "\", 现在还不能购买");
+			returnResult = orderOperation(startTime, wait, skuBuyNum, checkPayAmount, returnResult);
+		}
+		return returnResult;
+	}
+
+	@Override
+	public void setWaitTime(String time) {
+		this.waitTime = time;
+	}
+
+	private ReturnResultBean orderOperation(long startTime, WebDriverWait wait, String skuBuyNum, String checkPayAmount,
+			ReturnResultBean returnResult) {
+		wait.until(isPageLoaded());
+		WebElement webElement = null;
+		try {
+			webElement = driver.findElement(By.cssSelector("#buyNum"));
+			if (webElement == null) {
+				returnResult.setReturnMsg("没发现\"数量\"选项, 现在还不能购买");
 				return returnResult;
+			} else {
+				String max = webElement.getAttribute("max");
+				skuBuyNum = (Integer.valueOf(max) > Integer.valueOf(skuBuyNum)) ? skuBuyNum : max;
+				webElement.sendKeys(Keys.CONTROL + "a"); // 清空
+				webElement.sendKeys(new String[] { skuBuyNum });
 			}
-			try {
-				webElement = driver.findElement(By.cssSelector("#buyNowAddCart"));
-				if (webElement == null) {
-					returnResult.setReturnMsg("没发现\"立即购买\"按钮, 现在还买不不能购买");
-					return returnResult;
-				} else {
-					if (webElement.getCssValue("display").equals("none")) {
-						returnResult.setReturnMsg("没发现\"立即购买\"按钮, 现在还买不不能购买");
-						return returnResult;
-					}
-					webElement.click();
-				}
-			} catch (org.openqa.selenium.NoSuchElementException e) {
+		} catch (org.openqa.selenium.NoSuchElementException e) {
+			returnResult.setReturnMsg("没发现\"数量\"选项, 现在还不能购买");
+			return returnResult;
+		} catch (org.openqa.selenium.WebDriverException e) {
+			returnResult.setReturnMsg("加载出现问题, 将重试");
+			return returnResult;
+		}
+		wait.until(isPageLoaded());
+		try {
+			webElement = driver.findElement(By.cssSelector("#buyNowAddCart"));
+			if (webElement == null) {
 				returnResult.setReturnMsg("没发现\"立即购买\"按钮, 现在还买不不能购买");
 				return returnResult;
-			}
-			try {
-				wait.until(ExpectedConditions
-						.visibilityOfElementLocated(By.cssSelector("#submit-btn[name='new_icart2_account_submit']")));
-			} catch (org.openqa.selenium.TimeoutException e) {
-				if (driver.getCurrentUrl().startsWith("https://shopping.suning.com/trafficLimitError.do")) {
-					returnResult.setResultCode(-2);
-					returnResult.setReturnMsg("凉凉，被苏宁盯上了, 说操作太过频繁， 预计300秒后可以正常结算");
+			} else {
+				if (webElement.getCssValue("display").equals("none")) {
+					returnResult.setReturnMsg("没发现\"立即购买\"按钮, 现在还买不不能购买");
 					return returnResult;
 				}
-				returnResult.setReturnMsg("没加载\"提交订单\"按钮, 无法购买");
-				return returnResult;
+				wait.until(ExpectedConditions.visibilityOf(webElement));
+				webElement.click();
 			}
-			WebElement submitWebElement = driver
-					.findElement(By.cssSelector("#submit-btn[name='new_icart2_account_submit']"));
-			try {
-				wait.until(ExpectedConditions.visibilityOf(submitWebElement));
-			} catch (org.openqa.selenium.TimeoutException e) {
-				returnResult.setReturnMsg("\"提交订单\"按钮不可见, 无法购买");
-				return returnResult;
-			}
-			returnResult.setResultCode(0);
-			returnResult.setReturnMsg("测试下单成功了");
+		} catch (org.openqa.selenium.NoSuchElementException e) {
+			returnResult.setReturnMsg("没发现\"立即购买\"按钮, 现在还买不不能购买");
+			return returnResult;
+		} catch (org.openqa.selenium.WebDriverException e) {
+			returnResult.setReturnMsg("加载出现问题, 将重试");
+			return returnResult;
 		}
+		try {
+			wait.until(ExpectedConditions
+					.visibilityOfElementLocated(By.cssSelector("#submit-btn[name='new_icart2_account_submit']")));
+		} catch (org.openqa.selenium.TimeoutException e) {
+			if (driver.getCurrentUrl().startsWith("https://shopping.suning.com/trafficLimitError.do")) {
+				returnResult.setResultCode(-2);
+				returnResult.setReturnMsg("凉凉，被苏宁盯上了, 说操作太过频繁， 预计300秒后可以正常结算");
+				return returnResult;
+			}
+			returnResult.setReturnMsg("没加载\"提交订单\"按钮, 无法购买");
+			return returnResult;
+		} catch (org.openqa.selenium.WebDriverException e) {
+			returnResult.setReturnMsg("加载出现问题, 将重试");
+			return returnResult;
+		}
+		WebElement submitWebElement = driver
+				.findElement(By.cssSelector("#submit-btn[name='new_icart2_account_submit']"));
+		try {
+			wait.until(ExpectedConditions.visibilityOf(submitWebElement));
+		} catch (org.openqa.selenium.TimeoutException e) {
+			returnResult.setReturnMsg("\"提交订单\"按钮不可见, 无法购买");
+			return returnResult;
+		} catch (org.openqa.selenium.WebDriverException e) {
+			returnResult.setReturnMsg("加载出现问题, 将重试");
+			return returnResult;
+		}
+		if (!checkPayAmount.equals("-1")) {
+			try {
+				webElement = driver.findElement(By.cssSelector("#payAmountID"));
+				if (webElement == null) {
+					returnResult.setReturnMsg("没发现\"应付金额\", 无法校验");
+					return returnResult;
+				} else {
+					String amount = webElement.getText().trim();
+					if (Double.valueOf(amount) > Double.valueOf(checkPayAmount)) {
+						returnResult.setReturnMsg("应付金额 = " + amount + "大于设定金额" + checkPayAmount + ", 暂不购买");
+						return returnResult;
+					}
+				}
+			} catch (org.openqa.selenium.NoSuchElementException e) {
+				returnResult.setReturnMsg("没发现\"应付金额\", 无法校验");
+				return returnResult;
+			} catch (org.openqa.selenium.WebDriverException e) {
+				returnResult.setReturnMsg("加载出现问题, 将重试");
+				return returnResult;
+			}
+		}
+		submitWebElement.click();
+		long endTime = System.currentTimeMillis();
+		float excTime = (float) (endTime - startTime) / 1000;
+		log.info("提交订单花费时间：" + excTime + "s");
+		int retryCount = 0;
+		do {
+			try {
+				wait.until(ExpectedConditions.titleContains("支付收银台"));
+				wait.until(isPageLoaded());
+			} catch (org.openqa.selenium.TimeoutException e) {
+				if (driver.getCurrentUrl().startsWith("https://shopping.suning.com/order.do") && retryCount == 0) {
+					submitWebElement.click();
+					retryCount = 1;
+					continue;
+				}
+				if (!driver.getCurrentUrl().startsWith("https://payment.suning.com")) {
+					try {
+						webElement = driver.findElement(By.cssSelector(".container"));
+						if (webElement != null && webElement.getCssValue("display").equals("block")) {
+							webElement = webElement.findElement(By.cssSelector(".content>div>p"));
+							if (webElement != null) {
+								returnResult.setReturnMsg("凉凉: " + webElement.getText());
+								return returnResult;
+							}
+						}
+					} catch (org.openqa.selenium.NoSuchElementException e1) {
+						returnResult.setReturnMsg("好像没下单成功");
+						return returnResult;
+					}
+					returnResult.setReturnMsg("好像没下单成功");
+					return returnResult;
+				}
+			}
+		} while (retryCount == 1);
+		returnResult.setResultCode(0);
+		returnResult.setReturnMsg("好像下单成功了");
 		return returnResult;
 	}
 

@@ -1,8 +1,8 @@
 ﻿#任务开始时间，达到或超过该时间任务将开始启动，格式为yyyy-MM-dd HH:mi:ss
-task.begintime=2018-07-22 17:40:00
+task.begintime=2018-07-24 22:15:00
 
 #任务开始时间，达到或超过该时间任务将停止，格式为yyyy-MM-dd HH:mi:ss
-task.endtime=2018-07-22 17:50:00
+task.endtime=2018-07-25 07:35:00
 
 #当设置为0时，程序默认启动一个针对始时间超前1秒和一个延迟1秒的任务，对时间差做个小容错，1不启动
 task.closeDefaultTask=1
@@ -10,7 +10,10 @@ task.closeDefaultTask=1
 #任务数，可以理解为同时起多少个来并发下单，最高不要超过CPU核数*2
 task.num=1
 
-#本程序驱动，1：Chrome浏览器驱动，2：本程序内置浏览器驱动(目前只支持1)
+#程序加载网页超时时间，单位秒，例如配置了6，则程序在加载下单页面时，超过6秒还没有加载完，则放弃本次加载，重新进入下一个循环来下单。
+driver.wait=6
+
+#本程序驱动，1：Chrome浏览器驱动，2：本程序内置浏览器驱动
 driver.model=1
 
 #是否打开浏览器界面，1不打卡，0打开，建议不打开，速度相对快一些，想看程序的模拟过程或者下单不成功时想看看页面停在哪里的时候可以打开
@@ -20,23 +23,41 @@ driver.headless=1
 driver.noImages=1
 
 #苏宁账号用户名
-web.userName=185771237720
+web.userName=18577787720
 
 #苏宁账号密码
-web.password=hb71231210chw
+web.password=hb710chw
+
+#1手机，2茅台
+web.sku=2
 
 #要购买的手机的链接
-sku.url=https://product.suning.com/0000000000/690105206.html
+phone.url=https://product.suning.com/0000000000/690105194.html
 
 #要购买的手机的颜色
-sku.color=金色
+phone.color=金色
 
 #要购买的手机的版本
-sku.version=64G公开版
+phone.version=64G公开版
 
 #要下单多少个
-sku.buyNum=1
+phone.buyNum=1
 
-#是否要校验金额，-1不校验，其他则校验，校验规则是，当应付金额小于等于这里配置的金额时本程序才会下单，格式精确到小数点后两位
-sku.checkPayAmount=5088.00
+#是否要校验金额，0不校验，其他则校验，校验规则是，当应付金额小于等于这里配置的金额时本程序才会下单，格式精确到小数点后两位
+phone.checkPayAmount=4488.00
 
+
+#要购买的茅台的链接
+maotai.url=https://product.suning.com/0030000757/125615949.html
+
+#茅台系列
+maotai.serial=飞天43度
+
+#茅台规格
+maotai.spec=500ml
+
+#要下单多少个
+maotai.buyNum=1
+
+#是否要校验金额，0不校验，其他则校验
+maotai.checkPayAmount=1499.00

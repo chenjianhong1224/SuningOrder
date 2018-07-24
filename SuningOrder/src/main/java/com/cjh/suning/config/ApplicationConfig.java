@@ -36,27 +36,53 @@ public class ApplicationConfig {
 
 	@Value("${web.password:}")
 	private String password;
+	
+	@Value("${web.sku:1}")
+	private String sku;
 
-	@Value("${sku.url:}")
-	private String skuUrl;
+	@Value("${phone.url:}")
+	private String phoneUrl;
 
-	@Value("${sku.color:}")
-	private String skuColor;
+	@Value("${phone.color:}")
+	private String phoneColor;
 
-	@Value("${sku.version:}")
-	private String skuVersion;
+	@Value("${phone.version:}")
+	private String phoneVersion;
 
-	@Value("${sku.phonedl:裸机版}")
-	private String skuPhonedl;
+	@Value("${phone.phonedl:裸机版}")
+	private String phonePhonedl;
 
-	@Value("${sku.buyNum:1}")
-	private String skuBuyNum;
+	@Value("${phone.buyNum:1}")
+	private String phoneBuyNum;
 
-	@Value("${sku.checkPayAmount:-1}")
-	private String skuCheckPayAmount;
+	@Value("${phone.checkPayAmount:-1}")
+	private String phoneCheckPayAmount;
 
 	@Value("${task.closeDefaultTask:1}")
 	private String closeDefaultTask;
+	
+	@Value("${maotai.url:}")
+	private String maotaiUrl;
+
+	public String getMaotaiUrl() {
+		return maotaiUrl;
+	}
+
+	public void setMaotaiUrl(String maotaiUrl) {
+		this.maotaiUrl = maotaiUrl;
+	}
+
+	@Value("${maotai.serial:}")
+	private String maotaiSerial;
+	
+	@Value("${maotai.spec:}")
+	private String maotaiSpec;
+	
+	@Value("${maotai.buyNum:}")
+	private String maotaiBuyNum;
+
+	@Value("${maotai.checkPayAmount:}")
+	private String maotaiCheckPayAmount;
 
 	public String getModel() {
 		return model;
@@ -98,52 +124,52 @@ public class ApplicationConfig {
 		this.password = password;
 	}
 
-	public String getSkuUrl() {
-		return skuUrl;
+	public String getPhoneUrl() {
+		return phoneUrl;
 	}
 
-	public void setSkuUrl(String skuUrl) {
-		this.skuUrl = skuUrl;
+	public void setPhoneUrl(String phoneUrl) {
+		this.phoneUrl = phoneUrl;
 	}
 
-	public String getSkuColor() {
-		return skuColor;
+	public String getPhoneColor() {
+		return phoneColor;
 	}
 
-	public void setSkuColor(String skuColor) {
-		this.skuColor = skuColor;
+	public void setPhoneColor(String phoneColor) {
+		this.phoneColor = phoneColor;
 	}
 
-	public String getSkuVersion() {
-		return skuVersion;
+	public String getPhoneVersion() {
+		return phoneVersion;
 	}
 
-	public void setSkuVersion(String skuVersion) {
-		this.skuVersion = skuVersion;
+	public void setPhoneVersion(String phoneVersion) {
+		this.phoneVersion = phoneVersion;
 	}
 
-	public String getSkuPhonedl() {
-		return skuPhonedl;
+	public String getPhonePhonedl() {
+		return phonePhonedl;
 	}
 
-	public void setSkuPhonedl(String skuPhonedl) {
-		this.skuPhonedl = skuPhonedl;
+	public void setPhonePhonedl(String phonePhonedl) {
+		this.phonePhonedl = phonePhonedl;
 	}
 
-	public String getSkuBuyNum() {
-		return skuBuyNum;
+	public String getPhoneBuyNum() {
+		return phoneBuyNum;
 	}
 
-	public void setSkuBuyNum(String skuBuyNum) {
-		this.skuBuyNum = skuBuyNum;
+	public void setPhoneBuyNum(String phoneBuyNum) {
+		this.phoneBuyNum = phoneBuyNum;
 	}
 
-	public String getSkuCheckPayAmount() {
-		return skuCheckPayAmount;
+	public String getPhoneCheckPayAmount() {
+		return phoneCheckPayAmount;
 	}
 
-	public void setSkuCheckPayAmount(String skuCheckPayAmount) {
-		this.skuCheckPayAmount = skuCheckPayAmount;
+	public void setPhoneCheckPayAmount(String phoneCheckPayAmount) {
+		this.phoneCheckPayAmount = phoneCheckPayAmount;
 	}
 
 	public String getTaskBeginTime() {
@@ -184,5 +210,45 @@ public class ApplicationConfig {
 
 	public void setWaitTime(String waitTime) {
 		this.waitTime = waitTime;
+	}
+
+	public String getSku() {
+		return sku;
+	}
+
+	public void setSku(String sku) {
+		this.sku = sku;
+	}
+
+	public String getMaotaiSerial() {
+		return maotaiSerial;
+	}
+
+	public void setMaotaiSerial(String maotaiSerial) {
+		this.maotaiSerial = maotaiSerial;
+	}
+
+	public String getMaotaiSpec() {
+		return maotaiSpec;
+	}
+
+	public void setMaotaiSpec(String maotaiSpec) {
+		this.maotaiSpec = maotaiSpec;
+	}
+
+	public String getMaotaiBuyNum() {
+		return maotaiBuyNum;
+	}
+
+	public void setMaotaiBuyNum(String maotaiBuyNum) {
+		this.maotaiBuyNum = maotaiBuyNum;
+	}
+
+	public String getMaotaiCheckPayAmount() {
+		return maotaiCheckPayAmount;
+	}
+
+	public void setMaotaiCheckPayAmount(String maotaiCheckPayAmount) {
+		this.maotaiCheckPayAmount = maotaiCheckPayAmount;
 	}
 }
