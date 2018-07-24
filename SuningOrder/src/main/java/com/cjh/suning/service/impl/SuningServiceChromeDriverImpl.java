@@ -131,7 +131,7 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 		WebDriverWait wait = null;
 		WebElement webElement = null;
 		if (isInit && driver != null) {
-			wait = new WebDriverWait(driver, 5);
+			wait = new WebDriverWait(driver, 6);
 			driver.get(skuUrl);
 			wait.until(isPageLoaded());
 			try {
@@ -150,6 +150,9 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 				}
 			} catch (org.openqa.selenium.NoSuchElementException e) {
 				returnResult.setReturnMsg("没发现\"" + skuColor + "\", 现在还不能购买");
+				return returnResult;
+			} catch (org.openqa.selenium.WebDriverException e) {
+				returnResult.setReturnMsg("加载出现问题, 将重试");
 				return returnResult;
 			}
 			wait.until(isPageLoaded());
@@ -170,6 +173,9 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 				}
 			} catch (org.openqa.selenium.NoSuchElementException e) {
 				returnResult.setReturnMsg("没发现\"" + skuVersion + "\", 现在还不能购买");
+				return returnResult;
+			} catch (org.openqa.selenium.WebDriverException e) {
+				returnResult.setReturnMsg("加载出现问题, 将重试");
 				return returnResult;
 			}
 			wait.until(isPageLoaded());
@@ -196,6 +202,9 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 			} catch (org.openqa.selenium.NoSuchElementException e) {
 				returnResult.setReturnMsg("没发现\"" + skuPhonel + "\", 现在还不能购买");
 				return returnResult;
+			} catch (org.openqa.selenium.WebDriverException e) {
+				returnResult.setReturnMsg("加载出现问题, 将重试");
+				return returnResult;
 			}
 			try {
 				webElement = driver.findElement(By.cssSelector("#buyNum"));
@@ -211,6 +220,9 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 			} catch (org.openqa.selenium.NoSuchElementException e) {
 				returnResult.setReturnMsg("没发现\"数量\"选项, 现在还不能购买");
 				return returnResult;
+			} catch (org.openqa.selenium.WebDriverException e) {
+				returnResult.setReturnMsg("加载出现问题, 将重试");
+				return returnResult;
 			}
 			wait.until(isPageLoaded());
 			try {
@@ -223,10 +235,14 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 						returnResult.setReturnMsg("没发现\"立即购买\"按钮, 现在还买不不能购买");
 						return returnResult;
 					}
+					wait.until(ExpectedConditions.visibilityOf(webElement));
 					webElement.click();
 				}
 			} catch (org.openqa.selenium.NoSuchElementException e) {
 				returnResult.setReturnMsg("没发现\"立即购买\"按钮, 现在还买不不能购买");
+				return returnResult;
+			} catch (org.openqa.selenium.WebDriverException e) {
+				returnResult.setReturnMsg("加载出现问题, 将重试");
 				return returnResult;
 			}
 			try {
@@ -240,6 +256,9 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 				}
 				returnResult.setReturnMsg("没加载\"提交订单\"按钮, 无法购买");
 				return returnResult;
+			} catch (org.openqa.selenium.WebDriverException e) {
+				returnResult.setReturnMsg("加载出现问题, 将重试");
+				return returnResult;
 			}
 			WebElement submitWebElement = driver
 					.findElement(By.cssSelector("#submit-btn[name='new_icart2_account_submit']"));
@@ -247,6 +266,9 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 				wait.until(ExpectedConditions.visibilityOf(submitWebElement));
 			} catch (org.openqa.selenium.TimeoutException e) {
 				returnResult.setReturnMsg("\"提交订单\"按钮不可见, 无法购买");
+				return returnResult;
+			} catch (org.openqa.selenium.WebDriverException e) {
+				returnResult.setReturnMsg("加载出现问题, 将重试");
 				return returnResult;
 			}
 			if (!checkPayAmount.equals("-1")) {
@@ -264,6 +286,9 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 					}
 				} catch (org.openqa.selenium.NoSuchElementException e) {
 					returnResult.setReturnMsg("没发现\"应付金额\", 无法校验");
+					return returnResult;
+				} catch (org.openqa.selenium.WebDriverException e) {
+					returnResult.setReturnMsg("加载出现问题, 将重试");
 					return returnResult;
 				}
 			}

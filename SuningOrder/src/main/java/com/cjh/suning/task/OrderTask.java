@@ -48,6 +48,7 @@ public class OrderTask implements Runnable {
 				}
 				if (now.getTime() > endTime.getTime()) {
 					log.info("到点了, 收工...");
+					return;
 				}
 				while (now.getTime() < beginTime.getTime()) {
 					if ((beginTime.getTime() - now.getTime()) < (2 * 1000 * 60)) { // 小于两分钟
@@ -72,6 +73,7 @@ public class OrderTask implements Runnable {
 					now = new Date();
 					if (now.getTime() > endTime.getTime()) {
 						log.info("到点了, 收工...");
+						return;
 					}
 					long startTime = System.currentTimeMillis();
 					result = suningService.order(applicationConfig.getSkuUrl(), applicationConfig.getSkuColor(),
@@ -99,10 +101,10 @@ public class OrderTask implements Runnable {
 						float avgExcTime = sumExcTime / count;
 						float leftTime = 60f - sumExcTime;
 						if (leftTime > 0) {
-							if (avgExcTime > 5.5) {
-								sleepTime = (long) (leftTime - avgExcTime * 2) * 1000 / 5;
+							if (avgExcTime > 5.8) {
+								sleepTime = (long) Math.ceil((leftTime - avgExcTime * 2) * 1000 / 5);
 							} else {
-								sleepTime = (long) (leftTime - avgExcTime) * 1000 / 5;
+								sleepTime = (long) Math.ceil((leftTime - avgExcTime) * 1000 / 5);
 							}
 						} else {
 							sleepTime = 1;

@@ -22,6 +22,9 @@ public class ApplicationConfig {
 	@Value("${driver.model:1}")
 	private String model; // 1:chromeDriver
 
+	@Value("${driver.wait:6}")
+	private String waitTime;
+
 	@Value("${driver.headless:1}")
 	private String headless;
 
@@ -173,5 +176,13 @@ public class ApplicationConfig {
 
 	public void setCloseDefaultTask(String closeDefaultTask) {
 		this.closeDefaultTask = closeDefaultTask;
+	}
+
+	public String getWaitTime() {
+		return waitTime;
+	}
+
+	public void setWaitTime(String waitTime) {
+		this.waitTime = waitTime;
 	}
 }
