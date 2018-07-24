@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -31,6 +32,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -101,7 +103,7 @@ public class I360Test {
 					"/html/body/div/div[1]/div[2]/div/table/tbody/tr/td[2]/div/div/div[2]/div/div[1]/div/div[2]/form/div[3]/div/div/div/span"))
 					.click();
 			if (driver.findElement(By.xpath(
-					"//*[@id=\"doc\"]/div[1]/div[2]/div/table/tbody/tr/td[2]/div/div/div[2]/div/div[1]/div/div[2]/form/div[3]"))
+					"//*[@id=\"doc\"]/div[1]/div[2]/div/table/tbody/tr/td[2]/div/div/div[2]/div/div[1]/div/div[2]/form/div[2]"))
 					.isDisplayed()) {
 				System.out.println("请输入验证码，回车结束");
 				String val = input.next();
@@ -118,6 +120,7 @@ public class I360Test {
 			driver.findElement(By.xpath(
 					"/html/body/div/div[1]/div[2]/div/table/tbody/tr/td[2]/div/div/div[2]/div/div[1]/div/div[2]/form/div[5]/input"))
 					.click();
+			wait.until(ExpectedConditions.titleContains("360商城"));
 			wait.until(isPageLoaded());
 			Set<Cookie> driverCookies = driver.manage().getCookies();
 			List<BasicClientCookie> cookies = Lists.newArrayList();
@@ -144,10 +147,7 @@ public class I360Test {
 		String url = "http://i360mall.com/cart/addToCart";
 		URI uri = null;
 		try {
-			List<NameValuePair> addToCar = Lists.newArrayList();
-			addToCar.add(new BasicNameValuePair("itemId", "3430987"));
-			addToCar.add(new BasicNameValuePair("num", "1"));
-			uri = new URIBuilder(url).addParameters(addToCar).build();
+			uri = new URIBuilder(url).build();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 			input.close();
@@ -160,21 +160,31 @@ public class I360Test {
 		headerList.add(new BasicHeader(HttpHeaders.ACCEPT, "application/json, text/javascript, */*; q=0.01"));
 		headerList.add(new BasicHeader(HttpHeaders.ACCEPT_ENCODING, "gzip, deflate"));
 		headerList.add(new BasicHeader(HttpHeaders.CONNECTION, "keep-alive"));
-		headerList.add(new BasicHeader(HttpHeaders.ACCEPT_LANGUAGE,
-				"zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2"));
+		headerList.add(new BasicHeader("X-Requested-With", "XMLHttpRequest"));
+		headerList.add(new BasicHeader("Origin", "http://i360mall.com"));
+		headerList.add(new BasicHeader(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.8"));
 		headerList.add(new BasicHeader(HttpHeaders.HOST, "i360mall.com"));
 		headerList.add(new BasicHeader(HttpHeaders.REFERER, "http://i360mall.com/shop/item?itemId=3430987"));
 		headerList.add(new BasicHeader(HttpHeaders.USER_AGENT,
-				"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:61.0) Gecko/20100101 Firefox/61.0"));
+				"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36"));
 		// 构造自定义的HttpClient对象
 		HttpClient httpClient = HttpClients.custom().setDefaultHeaders(headerList).build();
 
 		// 构造请求对象
-		HttpUriRequest httpUriRequest = RequestBuilder.post().setUri(uri).build();
+		List<NameValuePair> addToCar = Lists.newArrayList();
+		addToCar.add(new BasicNameValuePair("itemId", "3430987"));
+		addToCar.add(new BasicNameValuePair("num", "1"));
+		HttpUriRequest httpUriRequest = RequestBuilder.post().addParameters(new BasicNameValuePair("itemId", "3430987"))
+				.addParameters(new BasicNameValuePair("num", "1")).setUri(uri).build();
 		// 执行请求，传入HttpContext，将会得到请求结果的信息
 		try {
 			HttpResponse response = httpClient.execute(httpUriRequest, httpClientContext);
 			System.out.println(response.getStatusLine().getStatusCode());
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				String content = EntityUtils.toString(entity);
+				System.out.println(content);
+			}
 			System.out.println(JSON.toJSONString(httpClientContext.getCookieStore().getCookies()));
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
