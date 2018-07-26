@@ -57,8 +57,8 @@ public class ChromeDriverTest {
 					wait = new WebDriverWait(driver, 10);
 					JavascriptExecutor j = (JavascriptExecutor) driver;
 					j.executeScript("document.getElementsByClassName('pc-login')[0].style.display='block';");
-					driver.findElement(By.id("userName")).sendKeys(new String[] { "18577787720" });
-					driver.findElement(By.id("password")).sendKeys(new String[] { "hb710chw" });
+					driver.findElement(By.id("userName")).sendKeys(new String[] { "18577720" });
+					driver.findElement(By.id("password")).sendKeys(new String[] { "hb71hw" });
 					driver.findElement(By.id("submit")).click();
 					wait.until(ExpectedConditions.titleContains("苏宁易购(Suning.com)-送货更准时、价格更超值、上新货更快"));
 					wait.until(isPageLoaded());

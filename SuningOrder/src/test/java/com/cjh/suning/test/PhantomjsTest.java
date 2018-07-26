@@ -24,8 +24,8 @@ public class PhantomjsTest {
 		Process p;
 		long startTime = System.currentTimeMillis();
 		try {
-			String userName = "15677982400";
-			String password = "hb710chw";
+			String userName = "1567400";
+			String password = "hb7";
 			File file;
 			String phantomjsPath = "I:\\Program Files (x86)\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe";
 			String myLoginjsPath = "E:\\code\\eclipse-workspace\\SuningOrder\\src\\main\\resources\\SuningJs\\myLogin.js";

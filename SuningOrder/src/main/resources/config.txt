@@ -23,10 +23,10 @@ driver.headless=1
 driver.noImages=1
 
 #苏宁账号用户名
-web.userName=18577787720
+web.userName=185
 
 #苏宁账号密码
-web.password=hb710chw
+web.password=hb7w
 
 #1手机，2茅台
 web.sku=2
