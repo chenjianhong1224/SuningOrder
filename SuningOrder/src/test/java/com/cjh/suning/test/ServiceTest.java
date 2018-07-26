@@ -55,7 +55,7 @@ public class ServiceTest {
 		}
 		if (cookieStore == null) {
 			cookieStore = new BasicCookieStore();
-			ReturnResultBean bean = service.login("15677982400", "hb710chw");
+			ReturnResultBean bean = service.login("15670", "hbw");
 			if (bean.getResultCode() == 0) {
 				List<BasicClientCookie> cookies = (List<BasicClientCookie>) bean.getReturnObj();
 				// 创建一个HttpContext对象，用来保存Cookie
