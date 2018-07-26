@@ -61,6 +61,7 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 			if (applicationConfig.getHeadless().equals("1")) { // 无头模式
 				chromeOptions.addArguments("--headless");
 			}
+			chromeOptions.addArguments("--no-sandbox");
 			if (applicationConfig.getNoImages().equals("1")) { // 禁止加载图片
 				Map<String, Object> contentSettings = Maps.newHashMap();
 				contentSettings.put("images", 2);

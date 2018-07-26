@@ -39,7 +39,8 @@ public class ChromeDriverTest {
 			System.setProperty("webdriver.chrome.driver", driverPath); // 指定驱动路径
 			ChromeOptions chromeOptions = new ChromeOptions();
 			// 无头模式
-			// chromeOptions.addArguments("--headless");
+			chromeOptions.addArguments("--headless");
+			chromeOptions.addArguments("--no-sandbox");
 			/** begin 禁止加载图片 **/
 			Map<String, Object> contentSettings = Maps.newHashMap();
 			contentSettings.put("images", 2);
