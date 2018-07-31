@@ -49,12 +49,23 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 		try {
 			String driverPath = "";
 			try {
-				File file = ResourceUtils.getFile("classpath:chromedriver.exe");
-				if (file.exists()) {
-					driverPath = file.getPath();
+				if (applicationConfig.getSystem().equals("1")) {
+					File file = ResourceUtils.getFile("classpath:chromedriver.exe");
+					if (file.exists()) {
+						driverPath = file.getPath();
+					}
+				} else {
+					File file = ResourceUtils.getFile("classpath:chromedriver");
+					if (file.exists()) {
+						driverPath = file.getPath();
+					}
 				}
 			} catch (Exception e3) {
-				driverPath = "chromedriver.exe";
+				if (applicationConfig.getSystem().equals("1")) {
+					driverPath = "chromedriver.exe";
+				}else {
+					driverPath = "chromedriver";
+				}
 			}
 			System.setProperty("webdriver.chrome.driver", driverPath); // 指定驱动路径
 			ChromeOptions chromeOptions = new ChromeOptions();

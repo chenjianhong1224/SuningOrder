@@ -10,6 +10,23 @@ import org.springframework.stereotype.Component;
 @PropertySource(value = { "file:config.txt" }, encoding = "utf-8")
 public class ApplicationConfig {
 
+	@Value("${driver.system:1}") // 1:windows 2:linux
+	private String system;
+	
+	@Value("${driver.back:0}") //
+	private String backFlag;
+	
+	@Value("${task.platform:1}") // 1苏宁 2 360
+	private String taskPlatform;
+	
+	public String getTaskPlatform() {
+		return taskPlatform;
+	}
+
+	public void setTaskPlatform(String taskPlatform) {
+		this.taskPlatform = taskPlatform;
+	}
+
 	@Value("${task.begintime:}")
 	private String taskBeginTime;
 
@@ -250,5 +267,21 @@ public class ApplicationConfig {
 
 	public void setMaotaiCheckPayAmount(String maotaiCheckPayAmount) {
 		this.maotaiCheckPayAmount = maotaiCheckPayAmount;
+	}
+
+	public String getSystem() {
+		return system;
+	}
+
+	public void setSystem(String system) {
+		this.system = system;
+	}
+
+	public String getBackFlag() {
+		return backFlag;
+	}
+
+	public void setBackFlag(String backFlag) {
+		this.backFlag = backFlag;
 	}
 }

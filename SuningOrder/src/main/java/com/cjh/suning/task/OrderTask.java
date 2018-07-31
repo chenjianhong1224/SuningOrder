@@ -23,7 +23,7 @@ public class OrderTask implements Runnable {
 
 	Date endTime;
 
-	private static AtomicBoolean taskFinishFlag = new AtomicBoolean(false);;
+	private static AtomicBoolean taskFinishFlag = new AtomicBoolean(false);
 
 	private Logger log = LoggerFactory.getLogger(OrderTask.class);
 
