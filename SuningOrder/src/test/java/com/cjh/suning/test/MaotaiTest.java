@@ -203,13 +203,16 @@ public class MaotaiTest {
 		maotaiOrderBean.setVoucherId(0);
 		String orderBean = JSON.toJSONString(maotaiOrderBeans);
 		System.out.println(orderBean);
-		int count = 20000;
-		while (count > 0) {
+		while (true) {
 
 			Date now = new Date();
-			String begin = "2018-08-05 14:59:59";
+			String begin = "2018-08-12 14:59:55";
+			String end = "2018-08-12 15:10:00";
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			try {
+				if (now.getTime() > sdf.parse(end).getTime()) {
+					return;
+				}
 				Thread.sleep(1000);
 				if (now.getTime() < sdf.parse(begin).getTime()) {
 					Thread.sleep(1);
@@ -219,14 +222,13 @@ public class MaotaiTest {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			count--;
 			// 构造自定义Header信息
 			List<Header> headerList = Lists.newArrayList();
 			headerList.add(new BasicHeader(HttpHeaders.ACCEPT, "application/json, text/javascript, */*; q=0.01"));
 			headerList.add(new BasicHeader(HttpHeaders.ACCEPT_ENCODING, "gzip, deflate, br"));
 			headerList.add(new BasicHeader(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.8"));
 			headerList.add(new BasicHeader("appId", "1"));
-			String auth = "eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiIyMzBhZTI1Yy1lNTM2LTQyYTUtYjliNy01OGM3YWIzZTQzNzQiLCJzdWIiOiJrZXkmX18mWElBTkdMT05HJl9fJjI5Nzg2OTQmX18mY2h3X2sxJl9fJjAmX18mYjJjbWVtYmVyJl9fJnd4Jl9fJjEmX18mMCJ9.ZXoZg5IIBfSQBVyvwKZB-yDcTd6c9RNtCnNxZk2MGRdZgkl0GXT6K6bI_QPzGYFXxEHzZ7SCl6rbc7v_7isE0g";
+			String auth = "eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJkNDg3ZjY3YS1jYTMwLTRhMGYtOGJlZi0xYjBkYWIxMWExNTUiLCJzdWIiOiJrZXkmX18mWElBTkdMT05HJl9fJjI5Nzg2OTQmX18mY2h3X2sxJl9fJjAmX18mYjJjbWVtYmVyJl9fJnd4Jl9fJjEmX18mMCJ9.tuXBBVjGyQjSE2NJ7a_QdzIMyAkS8XEIzYeBNn1KHEcgVaXixhck-yAvbtAzEjlretRcR3e9OvtuyuCey1LIsQ";
 			headerList.add(new BasicHeader("auth", auth));
 			headerList.add(new BasicHeader("channelCode", "01"));
 			headerList.add(new BasicHeader("channelId", "01"));
@@ -262,11 +264,18 @@ public class MaotaiTest {
 				HttpClientContext httpClientContext = HttpClientContext.create();
 				HttpResponse response = httpClient.execute(httpUriRequest2, httpClientContext);
 				System.out.println(response.getStatusLine().getStatusCode());
-				HttpEntity entity = response.getEntity();
-				if (entity != null) {
-					String content = EntityUtils.toString(entity);
-					JSONObject jsonObject = JSON.parseObject(content);
-					System.out.println(content);
+				if (response.getStatusLine().getStatusCode() == 200) {
+					HttpEntity entity = response.getEntity();
+					if (entity != null) {
+						String content = EntityUtils.toString(entity);
+						JSONObject jsonObject = JSON.parseObject(content);
+						System.out.println(content);
+						if ((jsonObject.getInteger("resultCode") == 0)
+								&& jsonObject.getString("resultMsg").equals("success")) {
+							System.out.println("======================抢到啦=====================");
+							return;
+						}
+					}
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

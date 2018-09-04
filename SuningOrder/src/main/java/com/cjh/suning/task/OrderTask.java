@@ -39,6 +39,7 @@ public class OrderTask implements Runnable {
 			}
 			ReturnResultBean result = suningService.login(applicationConfig.getUserName(),
 					applicationConfig.getPassword());
+			log.info("登录成功了...");
 			if (result.getResultCode() == 0) {
 				suningService.refresh(applicationConfig.getPhoneUrl());
 				now = new Date();
@@ -50,12 +51,15 @@ public class OrderTask implements Runnable {
 					return;
 				}
 				while (now.getTime() < beginTime.getTime()) {
+					if(taskFinishFlag.get()) {
+						return;
+					}
 					if ((beginTime.getTime() - now.getTime()) < (2 * 1000 * 60)) { // 小于两分钟
 						Thread.sleep(1);
 						now = new Date();
 						continue; // 提高刷新频率
 					}
-					Thread.sleep(1000 * 60 * 1); // 1分钟刷新一次，避免session失效
+					Thread.sleep(1000 * 30 * 1); // 1分钟刷新一次，避免session失效
 					if (applicationConfig.getSku().equals("1")) {
 						suningService.refresh(applicationConfig.getPhoneUrl());
 					}

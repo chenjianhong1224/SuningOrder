@@ -13,6 +13,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -63,7 +64,7 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 			} catch (Exception e3) {
 				if (applicationConfig.getSystem().equals("1")) {
 					driverPath = "chromedriver.exe";
-				}else {
+				} else {
 					driverPath = "chromedriver";
 				}
 			}
@@ -110,6 +111,51 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 				wait = new WebDriverWait(driver, Long.parseLong(waitTime));
 				JavascriptExecutor j = (JavascriptExecutor) driver;
 				j.executeScript("document.getElementsByClassName('pc-login')[0].style.display='block';");
+				wait.until(isPageLoaded());
+				webElement = driver
+						.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div[1]/div[5]/div/div/div[3]"));
+				if (webElement != null && webElement.isDisplayed() && webElement.isEnabled()) {
+					Actions action = new Actions(driver);
+					// action.clickAndHold(webElement).perform(); // 鼠标左键按下不放
+					try {
+						int sum = 0;
+						while (sum < 274) {
+							double rand = Math.random();
+							int offset = (int) (Math.random() * 20);
+							sum += offset;
+							action.clickAndHold(webElement).moveByOffset(offset, 0).perform();
+							Thread.sleep(1);
+						}
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					action.release(webElement).perform(); // 释放鼠标
+					try {
+						wait.until(ExpectedConditions.textToBePresentInElement(
+								driver.findElement(By.xpath("//*[@id=\"dt_notice\"]")), "验证通过"));
+					} catch (org.openqa.selenium.TimeoutException e) {
+						try {
+							int sum = 0;
+							while (sum < 274) {
+								double rand = Math.random();
+								int offset = (int) (Math.random() * 20);
+								sum += offset;
+								action.clickAndHold(webElement).moveByOffset(offset, 0).perform();
+								Thread.sleep(1);
+							}
+							Thread.sleep(1000);
+						} catch (InterruptedException e2) {
+							// TODO Auto-generated catch block
+							e2.printStackTrace();
+						}
+						action.release(webElement).perform(); // 释放鼠标
+						wait.until(ExpectedConditions.textToBePresentInElement(
+								driver.findElement(By.xpath("//*[@id=\"dt_notice\"]")), "验证通过"));
+					}
+				}
+				driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div[1]/div[5]/div/div/div[1]"));
 				driver.findElement(By.id("userName")).sendKeys(new String[] { applicationConfig.getUserName() });
 				driver.findElement(By.id("password")).sendKeys(new String[] { applicationConfig.getPassword() });
 				driver.findElement(By.id("submit")).click();
