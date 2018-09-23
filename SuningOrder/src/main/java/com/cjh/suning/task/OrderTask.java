@@ -39,8 +39,8 @@ public class OrderTask implements Runnable {
 			}
 			ReturnResultBean result = suningService.login(applicationConfig.getUserName(),
 					applicationConfig.getPassword());
-			log.info("登录成功了...");
 			if (result.getResultCode() == 0) {
+				log.info("登录成功了...");
 				suningService.refresh(applicationConfig.getPhoneUrl());
 				now = new Date();
 				if (now.getTime() < beginTime.getTime()) {

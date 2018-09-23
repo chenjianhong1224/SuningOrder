@@ -1,7 +1,9 @@
 package com.cjh.suning.service.impl;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -9,6 +11,7 @@ import javax.annotation.PreDestroy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -27,6 +30,7 @@ import com.cjh.suning.bean.ReturnResultBean;
 import com.cjh.suning.config.ApplicationConfig;
 import com.cjh.suning.service.SuningService;
 import com.cjh.suning.utils.WebDriverJsHelper;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @Scope("prototype")
@@ -98,6 +102,38 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 		}
 	}
 
+	private static void printLocation(WebElement element) {
+		Point point = element.getLocation();
+		System.out.println(point.toString());
+	}
+
+	public List<Integer> getTracks(int distance, boolean flag) {
+		List<Integer> track = Lists.newArrayList();
+
+		int current = 0;
+		double t = 0.3;
+		double v = 0;
+		double v0 = 0;
+		double move = 0;
+		double a = 0;
+
+		int mid = distance * 3 / 4;
+		while (current < distance) {
+			v0 = v;
+			if (current < mid) {
+				a = 4;
+				v = v0 + a * t + new Random().nextInt(5);
+			} else {
+				a = -3;
+				v = v0 + a * t;
+			}
+			move = v0 * t + 1 / 2 * a * t * t;
+			current += move;
+			track.add((int) Math.round(move));
+		}
+		return track;
+	}
+
 	@Override
 	public ReturnResultBean login(String userName, String password) {
 		ReturnResultBean returnResult = new ReturnResultBean();
@@ -108,57 +144,44 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 			WebElement webElement = null;
 			try {
 				driver.get("https://passport.suning.com/ids/login");
-				wait = new WebDriverWait(driver, Long.parseLong(waitTime));
+				wait = new WebDriverWait(driver, 15);
 				JavascriptExecutor j = (JavascriptExecutor) driver;
 				j.executeScript("document.getElementsByClassName('pc-login')[0].style.display='block';");
 				wait.until(isPageLoaded());
+
 				webElement = driver
 						.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div[1]/div[5]/div/div/div[3]"));
 				if (webElement != null && webElement.isDisplayed() && webElement.isEnabled()) {
 					Actions action = new Actions(driver);
-					// action.clickAndHold(webElement).perform(); // 鼠标左键按下不放
-					try {
-						int sum = 0;
-						while (sum < 274) {
-							double rand = Math.random();
-							int offset = (int) (Math.random() * 20);
-							sum += offset;
-							action.clickAndHold(webElement).moveByOffset(offset, 0).perform();
-							Thread.sleep(1);
-						}
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					action.release(webElement).perform(); // 释放鼠标
-					try {
-						wait.until(ExpectedConditions.textToBePresentInElement(
-								driver.findElement(By.xpath("//*[@id=\"dt_notice\"]")), "验证通过"));
-					} catch (org.openqa.selenium.TimeoutException e) {
+					int count = 1;
+					while (count++ > 0) {
+						List<Integer> tracks = getTracks(274, true);
+						action.clickAndHold(webElement).perform();
 						try {
-							int sum = 0;
-							while (sum < 274) {
-								double rand = Math.random();
-								int offset = (int) (Math.random() * 20);
-								sum += offset;
-								action.clickAndHold(webElement).moveByOffset(offset, 0).perform();
-								Thread.sleep(1);
+							for (long track : tracks) {
+								action.moveByOffset((int) track, 0).perform();
 							}
-							Thread.sleep(1000);
-						} catch (InterruptedException e2) {
+							Thread.sleep(new Random().nextInt(500) + 200);
+							action.release().perform();
+						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
-							e2.printStackTrace();
+							e.printStackTrace();
 						}
-						action.release(webElement).perform(); // 释放鼠标
-						wait.until(ExpectedConditions.textToBePresentInElement(
-								driver.findElement(By.xpath("//*[@id=\"dt_notice\"]")), "验证通过"));
+						try {
+							wait.until(ExpectedConditions.textToBePresentInElement(
+									driver.findElement(By.xpath("//*[@id=\"dt_notice\"]")), "验证通过"));
+							break;
+						} catch (org.openqa.selenium.TimeoutException e) {
+							log.info("拉验证条失败了...等会重试");
+						}
 					}
 				}
 				driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div[1]/div[5]/div/div/div[1]"));
+
 				driver.findElement(By.id("userName")).sendKeys(new String[] { applicationConfig.getUserName() });
 				driver.findElement(By.id("password")).sendKeys(new String[] { applicationConfig.getPassword() });
 				driver.findElement(By.id("submit")).click();
+				log.info("login submit...");
 				wait.until(ExpectedConditions.titleContains("苏宁易购(Suning.com)-送货更准时、价格更超值、上新货更快"));
 				wait.until(isPageLoaded());
 				returnResult.setResultCode(0);
@@ -169,6 +192,7 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 						webElement = webElement.findElement(By.cssSelector("span"));
 						if (webElement != null) {
 							returnResult.setReturnMsg("登录失败: " + webElement.getText());
+							return returnResult;
 						}
 					}
 					returnResult.setReturnMsg("用户名密码方式输入登录失败了");
@@ -212,7 +236,7 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 				returnResult.setReturnMsg("没发现\"" + skuColor + "\", 现在还不能购买");
 				return returnResult;
 			} catch (org.openqa.selenium.WebDriverException e) {
-				returnResult.setReturnMsg("加载出现问题, 将重试");
+				returnResult.setReturnMsg("加载出现问题, 将重试 " + e.getMessage());
 				return returnResult;
 			}
 			wait.until(isPageLoaded());
@@ -308,7 +332,7 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 				returnResult.setReturnMsg("没发现\"" + skuSerial + "\", 现在还不能购买");
 				return returnResult;
 			} catch (org.openqa.selenium.WebDriverException e) {
-				returnResult.setReturnMsg("加载出现问题, 将重试");
+				returnResult.setReturnMsg("加载出现问题, 将重试 " + e.getMessage());
 				return returnResult;
 			}
 			wait.until(isPageLoaded());
@@ -350,7 +374,7 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 		WebElement webElement = null;
 		try {
 			webElement = driver.findElement(By.cssSelector("#buyNum"));
-			if (webElement == null) {
+			if (webElement == null || !webElement.isDisplayed()) {
 				returnResult.setReturnMsg("没发现\"数量\"选项, 现在还不能购买");
 				return returnResult;
 			} else {

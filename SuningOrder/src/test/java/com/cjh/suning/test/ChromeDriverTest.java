@@ -1,6 +1,7 @@
 package com.cjh.suning.test;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Function;
@@ -20,11 +21,26 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 
+import com.cjh.suning.service.impl.SuningServiceChromeDriverImpl;
 import com.google.common.collect.Maps;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class ChromeDriverTest {
+
+	@Test
+	public void testTrack() {
+		SuningServiceChromeDriverImpl impl = new SuningServiceChromeDriverImpl();
+		List<Integer> tracks = impl.getTracks(274, false);
+		System.out.println("======================");
+		System.out.println(tracks);
+		System.out.println("======================");
+		long sum = 0;
+		for (long i : tracks) {
+			sum += i;
+		}
+		System.out.println(sum);
+	}
 
 	@Test
 	public void testLogin() {
