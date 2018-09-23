@@ -26,6 +26,7 @@ public class SuningOrderApplication {
 		Date beginTime = formatter.parse(applicationConfig.getTaskBeginTime());
 		Date endTime = formatter.parse(applicationConfig.getTaskEndTime());
 		int threadNum = Integer.valueOf(applicationConfig.getTaskNum());
+		threadNum = 1;
 		List<Thread> threadList = Lists.newArrayList();
 		try {
 			if (applicationConfig.getTaskPlatform().equals("1")) {
@@ -46,31 +47,36 @@ public class SuningOrderApplication {
 					thread.start();
 					Thread.sleep(600);
 				}
-			}else {
+			} else {
 				I360OrderTask task = new I360OrderTask(beginTime, endTime);
 				Thread thread = new Thread(task, "work-0");
 				threadList.add(thread);
 				thread.start();
 			}
-			if (applicationConfig.getBackFlag().equals("0")) {
-				Scanner input = new Scanner(System.in);
-				String val = null;
-				do {
-					val = input.next();
-					Thread.sleep(10);
-				} while (!val.equals("q"));
-				System.out.println("你输入了\"q\", 程序正在退出，请勿关闭！");
-				input.close();
-			} else {
-				Date now = new Date();
-				while ((now.getTime() < endTime.getTime()) && !OrderTask.getTaskFinishFlag().get()) {
-					now = new Date();
-					Thread.sleep(10);
+			while (OrderTask.getLoginStatus().get() == 0) {
+				Thread.sleep(10);
+			}
+			if (OrderTask.getLoginStatus().get() == 2) {
+				if (applicationConfig.getBackFlag().equals("0")) {
+					Scanner input = new Scanner(System.in);
+					String val = null;
+					do {
+						val = input.nextLine();
+						Thread.sleep(10);
+					} while (!val.equals("q"));
+					System.out.println("你输入了\"q\", 程序正在退出，请勿关闭！");
+					input.close();
+				} else {
+					Date now = new Date();
+					while ((now.getTime() < endTime.getTime()) && !OrderTask.getTaskFinishFlag().get()) {
+						now = new Date();
+						Thread.sleep(10);
+					}
 				}
 			}
 			if (applicationConfig.getTaskPlatform().equals("1")) {
 				OrderTask.setTaskFinish();
-			}else {
+			} else {
 				I360OrderTask.setTaskFinish();
 			}
 			for (Thread thread : threadList) {

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -144,7 +145,7 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 			WebElement webElement = null;
 			try {
 				driver.get("https://passport.suning.com/ids/login");
-				wait = new WebDriverWait(driver, 15);
+				wait = new WebDriverWait(driver, Long.parseLong(waitTime));
 				JavascriptExecutor j = (JavascriptExecutor) driver;
 				j.executeScript("document.getElementsByClassName('pc-login')[0].style.display='block';");
 				wait.until(isPageLoaded());
@@ -194,9 +195,25 @@ public class SuningServiceChromeDriverImpl extends WebDriverJsHelper implements 
 							returnResult.setReturnMsg("登录失败: " + webElement.getText());
 							return returnResult;
 						}
+					} else {
+						webElement = driver.findElement(By.xpath("//*[@id=\"security-loginProtect\"]"));
+						if (webElement != null && webElement.isDisplayed()) {
+							driver.switchTo().frame(webElement);
+							driver.findElement(By.xpath("//*[@id=\"sendSmsCode\"]")).click();
+							log.info("请输入短信验证码...");
+							Scanner input = new Scanner(System.in);
+							String val = null;
+							val = input.nextLine();
+							input.close();
+							driver.findElement(By.xpath("//*[@id=\"phoneCode\"]")).sendKeys(new String[] {val});
+							driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/div/form/div/div[5]/a")).click();
+							wait.until(ExpectedConditions.titleContains("苏宁易购(Suning.com)-送货更准时、价格更超值、上新货更快"));
+							wait.until(isPageLoaded());
+							returnResult.setResultCode(0);
+						}
 					}
 					returnResult.setReturnMsg("用户名密码方式输入登录失败了");
-				} catch (org.openqa.selenium.NoSuchElementException e1) {
+				} catch (Exception e1) {
 					returnResult.setReturnMsg("好像登录失败了");
 				}
 			}

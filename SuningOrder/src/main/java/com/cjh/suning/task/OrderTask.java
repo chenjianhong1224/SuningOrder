@@ -3,6 +3,7 @@ package com.cjh.suning.task;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,16 @@ public class OrderTask implements Runnable {
 	Date endTime;
 
 	private static AtomicBoolean taskFinishFlag = new AtomicBoolean(false);
+	
+	private static AtomicInteger loginStatus = new AtomicInteger(0);
+
+	public static AtomicInteger getLoginStatus() {
+		return loginStatus;
+	}
+
+	public static void setLoginStatus(AtomicInteger loginStatus) {
+		OrderTask.loginStatus = loginStatus;
+	}
 
 	private Logger log = LoggerFactory.getLogger(OrderTask.class);
 
@@ -40,6 +51,7 @@ public class OrderTask implements Runnable {
 			ReturnResultBean result = suningService.login(applicationConfig.getUserName(),
 					applicationConfig.getPassword());
 			if (result.getResultCode() == 0) {
+				loginStatus.set(2);
 				log.info("登录成功了...");
 				suningService.refresh(applicationConfig.getPhoneUrl());
 				now = new Date();
@@ -131,11 +143,15 @@ public class OrderTask implements Runnable {
 					}
 					Thread.sleep(sleepTime > 0 ? sleepTime : 1);
 				}
+			}else {
+				loginStatus.set(1);
 			}
 			log.info(result.getReturnMsg());
 		} catch (InterruptedException e1) {
+			loginStatus.set(1);
 			log.info("任务中断...");
 		} catch (Exception e2) {
+			loginStatus.set(1);
 			log.info("任务异常", e2);
 		} finally {
 			log.info("任务退出");
